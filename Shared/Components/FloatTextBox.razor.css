@@ -1,0 +1,11 @@
+﻿.form-control {
+    height : calc(2.9rem);
+    line-height : 0.5;
+    font-size : 12px;
+}
+
+.form-floating label {
+    font-size : 12px;
+    letter-spacing : .5px;
+    padding-top: 1.2rem !important;
+}

@@ -1,0 +1,13 @@
+﻿.form-select {
+    height: calc(2.9rem);
+    font-size: 12px;
+}
+
+.form-floating label {
+    font-size: 12px;
+    letter-spacing: .5px;
+    padding-top: 1.1rem !important;
+}
+.form-floating > .form-select {
+    padding-top: 1.4rem !important;
+}

@@ -1,0 +1,263 @@
+﻿@page "/products"
+@using QuickTie.Portal.Models
+@using QuickTie.Portal.Pages.Product
+@using Microsoft.AspNetCore.Components.Web
+@using QuickTie.Portal.Pages.Product.Components
+@using QuickTie.Portal.Pages.Product.ProductItem
+@using QuickTie.Data.Models
+@using QuickTie.Cloud.Helpers
+
+@inject IJSRuntime JsRuntime
+@inject IProductService _productService
+
+<PageTitle>Products</PageTitle>
+
+<div class="page-header px-4 py-4">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold clickable p-0"
+                          NavigateUrl="/products"
+                          Text="Home" />
+            </li>
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold text-secondary p-0"
+                          Text="Products" />
+            </li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold">Products</h2>
+</div>
+
+<div class="product-filter px-3">
+    <div class="product-category pb-2">
+        @if(!initialCategoryFetched)
+        {
+            <div class="placeholder-glow col-12">
+                <p class="placeholder p-3 m-0 w-100"></p>
+            </div>
+        } else
+        {
+            <DxTabs ScrollMode="TabsScrollMode.Auto" RenderMode="TabsRenderMode.AllTabs">
+                <DxTab Click="@(() => OnTabClick(null))">
+                    <TextTemplate>
+                        <div class="d-flex flex-column align-items-center">
+                            <img width="32" height="32" src="images/product.png" alt="Category icon" />
+                            <p class="mb-0">All</p>
+                        </div>
+                    </TextTemplate>
+                </DxTab>
+                @foreach (var category in productTypeWithCounts.Keys)
+                {   
+                    <DxTab Click="@(()=> OnTabClick(category))"
+                           TabIconCssClass="@($"tabs-icon-{category.ToString().ToLower()}")">
+                        <TextTemplate>
+                            <div class="d-flex flex-column align-items-center">
+                                <img width="32" height="32" src="@productTypeWithCounts[category].ImageUrl" alt="Category icon" onerror="this.onerror=null; this.src='@defaultImageUrl';" />
+                                <p class="mb-0">@(productTypeWithCounts[category].DisplayName) (@productTypeWithCounts[category].Count)</p>
+                            </div>
+                        </TextTemplate>
+                    </DxTab>
+                }
+            </DxTabs>
+        }
+    </div>
+    <div class="d-flex flex-wrap pb-1">
+        <div class="col-sm-6 col-12 pb-2">
+            <DxTextBox BindValueMode="BindValueMode.OnDelayedInput"
+                       InputDelay="1000"
+                       Id="product-search"
+                       CssClass="p-1"
+                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                       TextChanged="@((newValue) => HandleSearchValueChanged(newValue))"
+                       NullText="Search by Name or Reference number">
+                <Buttons>
+                    <DxEditorButton IconCssClass="oi oi-magnifying-glass" />
+                </Buttons>
+            </DxTextBox>
+        </div>
+        <div class="col-sm-6 col-12 d-flex justify-content-end align-items-center pb-2">
+            <div>
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          IconCssClass="fa-solid fa-file-export"
+                          CssClass="px-3 btn-none"
+                          Text="Export" />
+            </div>
+            <div id="filter-option-popup">
+                <DxButton Click="() => IsFilterOptionOpen = !IsFilterOptionOpen"
+                          IconCssClass="fa-solid fa-filter"
+                          RenderStyle="@ButtonRenderStyle.None" 
+                          CssClass="fw-bold py-2 px-3 ms-2"
+                          Id="filter-btn"
+                          Text="Filter"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row product-list-view px-3 pt-3">
+    @if (TotalCount == 0 && initialDataFetched)
+    {
+        <h3 class="col-12 text-center my-3 fw-bold">No products</h3>
+    } else
+    {
+        <Virtualize @ref="productVirtualizer" ItemsProvider="LoadProducts" Context="item">
+            <ItemContent>
+                <ProductGridItem productItem="@item" searchText="@SearchValue" />
+            </ItemContent>
+            <Placeholder>
+                <GridItemPlaceholder />
+            </Placeholder>
+        </Virtualize>
+    }
+</div>
+
+<DxDropDown @bind-IsOpen="@IsFilterOptionOpen"
+    Width="max(25vw, 250px)"
+    PositionMode="DropDownPositionMode.Bottom"
+    PositionTarget="#filter-option-popup"
+    CloseMode="DropDownCloseMode.Close"
+    PreventCloseOnPositionTargetClick="true"
+    HeaderVisible="true"
+    HeaderText="Filter Options"
+    VerticalOffset="5"
+    FooterVisible="true"
+    MaxWidth="400"
+   >
+    <BodyContentTemplate>
+        <div class="filter-options d-flex justify-content-center align-content-center">
+            <div class="p-2">
+                <h6 class="mb-3">Price Range:</h6>
+                <RangeSlider RangeId="productRangeSlider"
+                             Min=0
+                             Max=1000
+                             Start=@FilterParameter.Start
+                             End=@FilterParameter.End
+                             Step=10 />
+                <form class="row">
+                    <div class="col-6 mb-3">
+                        <label for="minInput" class="form-label">Min</label>
+                        <DxSpinEdit Value="FilterParameter.Start"
+                                    ValueChanged="@((float start) => {FilterParameter.Start = start;})"
+                                    Id="priceStartValue"
+                                    CssClass="p-1"
+                                    InputDelay="500"
+                                    BindValueMode="BindValueMode.OnDelayedInput"
+                                    NullText="Type a start value..." />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="maxInput" class="form-label d-flex justify-content-end">Max</label>
+                        <DxSpinEdit Value="FilterParameter.End"
+                                    ValueChanged="@((float end) => {FilterParameter.End = end;})"
+                                    Id="priceEndValue"
+                                    InputDelay="500"
+                                    CssClass="p-1"
+                                    BindValueMode="BindValueMode.OnDelayedInput"
+                                    NullText="Type a end value..." />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button my-1 ms-2" 
+                  RenderStyle="ButtonRenderStyle.Secondary" 
+                  Text="Reset" 
+                  Click="ResetFilter"/>
+        <DxButton CssClass="popup-button my-1 ms-2" 
+                  RenderStyle="ButtonRenderStyle.None"
+                  Text="Apply"
+                  Id="filter-btn"
+                  Click="HandleFilter"/>
+    </FooterContentTemplate>
+</DxDropDown>
+
+
+@code {
+    Dictionary<ProductType, ProductTypeInfo> productTypeWithCounts = new Dictionary<ProductType, ProductTypeInfo>();
+
+    string? SearchValue { get; set; }
+    FilterParameter FilterParameter = new FilterParameter();
+    public long TotalCount { get; set; }
+    public IEnumerable<Product> ListProducts { get; set; }
+
+    private Virtualize<Product> productVirtualizer { get; set; } = null;
+    private DotNetObjectReference<Products>? objectReference;
+
+    bool initialDataFetched { get; set; } = false;
+    bool initialCategoryFetched { get; set; } = false;
+    bool IsFilterOptionOpen { get; set; } = false;
+
+    string defaultImageUrl = "images/product.png";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objectReference = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initFilterReference", objectReference);
+        }
+    }
+
+    async Task OnTabClick(ProductType? selectedCategory)
+    {
+        FilterParameter.SelectedCategory = selectedCategory != null ? new List<ProductType> { selectedCategory.Value } : null;
+        await HandleFilter();
+    }
+
+    async Task HandleSearchValueChanged(string search_value)
+    {
+        SearchValue = search_value;
+        await HandleFilter();
+    }
+
+    private void ResetFilter()
+    {
+        FilterParameter.Start = 0;
+        FilterParameter.End = 1000;
+        StateHasChanged();
+    }
+
+    private async Task HandleFilter()
+    {
+        await productVirtualizer.RefreshDataAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategory();
+    }
+
+    [JSInvokable]
+    public void UpdateSpinEditValue(float startValue, float endValue)
+    {
+        FilterParameter.Start = startValue;
+        FilterParameter.End = endValue;
+        StateHasChanged();
+    }
+
+    private async Task LoadCategory()
+    {
+        productTypeWithCounts = await _productService.GetCategoriesAsync(SearchValue, FilterParameter);
+        initialCategoryFetched = true;
+    }
+
+    private async ValueTask<ItemsProviderResult<Product>> LoadProducts(ItemsProviderRequest request)
+    {
+        if (request.Count <= 0)
+        {
+            request = new ItemsProviderRequest(request.StartIndex, 20, request.CancellationToken);
+        }
+
+        var (listProduct, count) = await _productService.GetProductsAsync(request.StartIndex, request.Count, SearchValue, FilterParameter, null);
+        TotalCount = count;
+        ListProducts = listProduct;
+        if (!initialDataFetched)
+        {
+            initialDataFetched = true;
+        }
+        StateHasChanged();
+        return new ItemsProviderResult<Product>(ListProducts, (int)TotalCount);
+    }
+}

@@ -1,0 +1,33 @@
+﻿@page "/logout"
+@layout AuthLayout
+
+@inject WebsiteAuthenticator _auth;
+
+@inject NavigationManager NavManager
+
+<div class="card-header text-center py-3 pb-5 px-5 bg-white border-0">
+    <DxButton Context="logo" RenderStyle="ButtonRenderStyle.None" CssClass="w-100 p-0" NavigateUrl="/">
+        <img height="80" src="images/logo.png" />
+    </DxButton>
+</div>
+<div class="card-body">
+    <h5 class="text-center fw-bold">Come back soon!</h5>
+    <h6 class="text-center mb-4 text-secondary">Thanks for using QuickTie. You are now successfully signed out.</h6>
+    <div class="d-flex justify-content-center">
+        <DxButton SubmitFormOnClick="true" 
+                  Text="<  Go to sign in page" 
+                  RenderStyle="ButtonRenderStyle.None" 
+                  Click="HandleClick"
+                  CssClass="btn-custom-primary fw-bold" />
+    </div>
+</div>
+
+@code {
+
+    private async Task HandleClick()
+    {
+        await _auth.LogoutAsync();
+        await Task.Delay(1000);
+        NavManager.NavigateTo("/login");
+    }
+}

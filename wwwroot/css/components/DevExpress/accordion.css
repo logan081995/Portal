@@ -1,0 +1,10 @@
+﻿.dxbl-accordion-group-header {
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.dxbl-accordion-item-text-tmpl > .dxbl-text {
+    padding: 0;
+    border: 0;
+}

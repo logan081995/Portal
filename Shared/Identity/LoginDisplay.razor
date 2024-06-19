@@ -1,0 +1,47 @@
+﻿@using QuickTie.Portal.Shared.Identity
+
+@inject ILocalStorageRepository _localStorageService
+
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView>
+    <Authorized>
+		<a class="nav-link dropdown-toggle d-flex align-items-center" href="/" data-bs-toggle="dropdown">
+			<DxButton Context="Avatar"
+					  RenderStyle="ButtonRenderStyle.None"
+					  CssClass="p-0 text-nowrap">
+				<h6 class="text-center">Hello, @context.User.Identity?.Name!</h6>
+			</DxButton>
+		</a>
+		<div class="dropdown-menu dropdown-menu-end dropdown-menu-right">
+			<div class="w-100">
+				<div class="flex-column align-items-center justify-content-center p-3">
+					<div class="logo-container d-flex align-items-center justify-content-center">
+                        <img height="50" class="rounded-circle" src="" />
+					</div>
+					<div class="user-name-container bm-3 m-2">
+						<h6 class="text-center">Hello, @context.User.Identity?.Name!</h6>
+					</div>
+					<div class="d-flex justify-content-center log-off-btn">
+						<DxButton Text="Log Off"
+								  RenderStyle="@ButtonRenderStyle.Secondary"
+								  NavigateUrl="/logout" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </Authorized>
+    <NotAuthorized>
+		<a class="nav-link" href="/login">
+			<DxButton Context="/login"
+					  RenderStyle="ButtonRenderStyle.None"
+					  CssClass="p-0 text-nowrap"
+					  IconCssClass="fa-solid fa-right-to-bracket menu-item-icon login fa-lg">
+			</DxButton>
+		</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool _themeSwitcherShown = false;
+}

@@ -1,0 +1,17 @@
+﻿.nav-link {
+    text-align: center;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 5px 15px !important;
+    border-radius: 5px;
+    color: #99a1b7;
+}
+    .nav-link:hover {
+        color: #009aa6;
+    }
+.active .nav-link {
+    box-shadow: 0 3px 4px rgba(0,0,0,.03);
+    color: #009aa6;
+}
+

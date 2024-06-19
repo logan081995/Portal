@@ -1,0 +1,35 @@
+﻿@page "/order-details"
+@layout MainLayout
+
+<div class="page-header py-4">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold text-black p-0"
+                          NavigateUrl="/products"
+                          Text="Home">
+                </DxButton>
+            </li>
+             <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold text-black p-0"
+                          NavigateUrl="/"
+                          Text="Orders">
+                </DxButton>
+            </li>
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold text-black p-0">
+                    <span class="text-secondary">
+                        Order #349
+                    </span>
+                </DxButton>
+            </li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold mb-0">Orders</h2>
+</div>
+@code {
+
+}

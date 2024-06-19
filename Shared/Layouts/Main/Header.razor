@@ -1,0 +1,42 @@
+﻿@using QuickTie.Portal.Models
+@using QuickTie.Portal.Constants
+@using QuickTie.Portal.Extensions
+@using QuickTie.Portal.Shared.Layouts.Main.Components
+
+@inject IJSRuntime JSRuntime
+
+<header class="px-1 py-3 px-md-4 d-flex flex-row justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <DxButton Context="Collapse" 
+                  RenderStyle="ButtonRenderStyle.None" 
+                  IconCssClass="fa-solid fa-bars fa-lg"
+                  Click="ToggleSidebar"
+                  CssClass="d-lg-none px-4" />
+        <DxButton Context="logo" 
+                  RenderStyle="ButtonRenderStyle.None" 
+                  Id="menu-logo" 
+                  CssClass=" p-0 text-nowrap"
+                  NavigateUrl="/">
+            <img height="50" class="d-none d-lg-block" src="images/logo.png" />
+            <img height="50" class="d-lg-none" src="favicon.ico" />
+	    </DxButton>
+    </div>
+	@*<_Menu />*@
+    <DxTextBox BindValueMode="BindValueMode.OnDelayedInput"
+               InputDelay="1000"
+               Id="global-search"
+               CssClass="p-1 rounded-pill d-none d-lg-flex"
+               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+               NullText="Search...">
+        <Buttons>
+            <DxEditorButton IconCssClass="oi oi-magnifying-glass" />
+        </Buttons>
+    </DxTextBox>
+	<_Navbar />
+</header>
+@code {
+    async Task ToggleSidebar()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleSidebar", "sidebar");
+    }
+}

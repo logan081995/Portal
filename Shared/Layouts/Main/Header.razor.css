@@ -1,0 +1,8 @@
+﻿header {
+    border-bottom: 1px solid var(--color-border);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+    background: var(--color-header-bg);
+}

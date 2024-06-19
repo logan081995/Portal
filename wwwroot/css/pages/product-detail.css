@@ -1,0 +1,15 @@
+﻿.product-badge {
+    font-size: 14px;
+    font-weight: 800;
+    color: #9e3039;
+    background: #fff;
+    padding: 3px 10px;
+    border-radius: 3px;
+    border: 1px solid #9e3039;
+    line-height: 20px;
+    text-transform: uppercase
+}
+
+.product-detail-edit-form label {
+    font-weight: 600 !important;
+}

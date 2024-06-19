@@ -1,0 +1,7 @@
+﻿.product-list-view {
+    border-top: 1px solid var(--color-border);
+}
+
+.product-list-view h3{
+    color: var(--color-text-sub);
+}

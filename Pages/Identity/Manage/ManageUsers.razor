@@ -1,0 +1,78 @@
+﻿@page "/identity/manage"
+@layout MainLayout
+
+@using QuickTie.Portal.Data.Identity.Interface;
+@using QuickTie.Portal.Models.Identity;
+
+@inject IUserService userService
+
+<div class="page-header px-4 py-4">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold clickable p-0"
+                          NavigateUrl="/products"
+                          Text="Home">
+                </DxButton>
+            </li>
+            <li class="breadcrumb-item">
+                <DxButton RenderStyle="ButtonRenderStyle.None"
+                          CssClass="fw-bold text-black p-0">
+                    <span class="text-secondary">
+                        Users
+                    </span>
+                </DxButton>
+            </li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold">Users</h2>
+</div>
+
+
+<div class="data-grid d-flex flex-row justify-content-between align-content-center mt-2">
+<DxGrid @ref="Grid"
+        Data="Users"
+        PageSize="12"
+        KeyFieldName="Id"
+        ValidationEnabled="false"
+        EditModelSaving="Grid_EditModelSaving"
+        EditMode="GridEditMode.EditRow"
+        EditorRenderMode="GridEditorRenderMode.Integrated"
+        ShowFilterRow="true">
+    <Columns>
+        <DxGridCommandColumn Width="160px" />
+        <DxGridDataColumn FieldName="UserName" MinWidth="120" Caption="User Name">
+            <CellDisplayTemplate>
+                <button type="button" class="btn btn-link p-0">@(context.Value)</button>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="FirstName" MinWidth="80" Caption="First Name" />
+        <DxGridDataColumn FieldName="LastName" MinWidth="80" Caption="Last Name" />
+        <DxGridDataColumn FieldName="Email" MinWidth="100" Caption="Email" />
+        <DxGridDataColumn FieldName="EmailConfirmed" MinWidth="80" Caption="Confirmed" />
+        <DxGridDataColumn FieldName="PhoneNumber" Width="10%" MinWidth="100" Caption="Phone Number" />
+        <DxGridDataColumn FieldName="AccountId" Width="10%" MinWidth="100" Caption="Account Id" />
+    </Columns>
+</DxGrid>
+</div>
+
+@code {
+    IEnumerable<WebsiteUser> Users { get; set; }
+    IGrid Grid { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        Users = await userService.GetUsersAsync();
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (!e.IsNew)
+            await userService.UpdateUserAsync((WebsiteUser)e.EditModel);
+        await UpdateDataAsync();
+    }
+    async Task UpdateDataAsync()
+    {
+        Users = await userService.GetUsersAsync();
+    }
+}

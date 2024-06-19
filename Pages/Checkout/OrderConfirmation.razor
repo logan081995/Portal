@@ -1,0 +1,55 @@
+﻿@page "/checkout/order-confirmation"
+@layout CheckoutLayout
+
+@using QuickTie.Portal.Models
+@inject ILocalStorageRepository _localStorageService
+
+<div class="d-flex align-items-center">
+    <div class="confirm-icon">
+        <i class="fa-regular fa-circle-check"></i>
+    </div>
+    <div class="ps-3">
+        <h5>Order <span class="order-number">#117</span></h5>
+        <h4 class="mb-0 fw-bold">@UserInfoData.ContactInfo.FirstName</h4>
+    </div>
+</div>
+
+<div class="order-updates p-3 mt-5">
+    <h5 class="fw-bold">Order Updates</h5>
+    <p class="mb-0">You will receive order and shipping updates via email.</p>
+</div>
+
+<div class="previous-info p-3 mt-4">
+    <div class="d-flex flex-row justify-content-between pb-3">
+        <p class="mb-0 text-secondary">Contact</p>
+        <p class="mb-0 w-75 text-start ps-3">@UserInfoData.ContactInfo.Email</p>
+    </div>
+    <div class="d-flex flex-row justify-content-between py-3">
+        <p class="mb-0 text-nowrap text-secondary">Ship to</p>
+        <p class="mb-0 w-75 text-start ps-3">@UserInfoData.ContactInfo.CombinedAddress</p>
+    </div>
+    <div class="d-flex flex-row justify-content-between py-3">
+        <p class="mb-0 text-secondary">Method</p>
+        <p class="mb-0 w-75 text-start ps-3">@UserInfoData.ShippingInfo.Name · $@UserInfoData.ShippingInfo.Cost</p>
+    </div>
+    @*
+    <div class="d-flex flex-row justify-content-between pt-3">
+        <p class="mb-0 text-secondary">Payment</p>
+        <p class="mb-0 w-75 text-start ps-3"> Purchase Order</p>
+    </div>*@
+</div>
+
+<div class="d-flex justify-content-between mt-4 mb-3">
+    <DxButton RenderStyle="ButtonRenderStyle.None" Text="< Continue to shopping" CssClass="fw-bold" NavigateUrl="/" />
+    <DxButton RenderStyle="ButtonRenderStyle.None" Text="Check Status" CssClass="text-uppercase px-3 py-2 btn-custom-1" NavigateUrl="/account" />
+</div>
+
+@code {
+    public UserInfo UserInfoData { get; set; } = new UserInfo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserInfoData = await _localStorageService.GetItemAsync<UserInfo>("userInfo");
+    }
+}
+

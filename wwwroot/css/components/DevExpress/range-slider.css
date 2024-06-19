@@ -1,0 +1,8 @@
+﻿.dx-slider-handle {
+    background-color: var(--color-secondary) !important;
+}
+
+.dx-slider-range.dx-slider-range-visible {
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary);
+}

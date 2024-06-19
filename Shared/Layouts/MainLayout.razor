@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@using QuickTie.Portal.Shared.Layouts.Main
+
+
+<PageTitle>QuickTie</PageTitle>
+
+<HeadContent>
+@*     @foreach (var item in _activeTheme.StylesheetLinkUrl)
+    {
+        <link href="@item" rel="stylesheet" />
+    } *@
+</HeadContent>
+
+<div>
+    <Drawer />
+    <div>
+        <Header />
+        <div id="wrapper">
+            <Sidebar />
+            <main>
+                <div id="content">
+                    @Body
+                </div>
+               <Footer />
+            </main>
+        </div>
+    </div>
+</div>
+

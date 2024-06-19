@@ -1,0 +1,99 @@
+﻿@inject IJSRuntime JSRuntime
+<div class="sidebar" id="sidebar">
+    <ul class="nav-links">
+        <li>
+            <a href="#">
+                <i class='arrow invisible'></i>
+                <i class='fa-solid fa-chart-pie'></i>
+                <span class="link_name">Home</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="#">Home</a></li>
+            </ul>
+        </li>
+        <li>
+            <div class="iocn-link">
+                <i class='bx bxs-chevron-down arrow'></i>
+                <a href="/products">
+                    <i class='bx bx-collection'></i>
+                    <span class="link_name">Pages</span>
+                </a>
+            </div>
+            <ul class="sub-menu">
+                <li><a class="link_name" href="#">Pages</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/">Orders</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="/identity/manage">
+                <i class='arrow invisible'></i>
+                <i class='fa-solid fa-user-shield'></i>
+                <span class="link_name">CRM</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="/identity/manage">CRM</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#">
+                <i class='arrow invisible'></i>
+                <i class='fa-regular fa-calendar'></i>
+                <span class="link_name">Event</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="#">Event</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#">
+                <i class='arrow invisible'></i>
+                <i class='fa-regular fa-comments'></i>
+                <span class="link_name">Chat</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="#">Chat</a></li>
+            </ul>
+        </li>
+        <li>
+            <div class="iocn-link">
+                <i class='bx bxs-chevron-down arrow'></i>
+                <a href="#">
+                    <i class='fa-regular fa-envelope'></i>
+                    <span class="link_name">Email</span>
+                </a>
+            </div>
+            <ul class="sub-menu">
+                <li><a class="link_name" href="#">Email</a></li>
+                <li><a href="#">Inbox</a></li>
+                <li><a href="#">Sent</a></li>
+                <li><a href="#">Compose</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#">
+                <i class='arrow invisible'></i>
+                <i class='bx bx-line-chart'></i>
+                <span class="link_name">Explore</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="#">Explore</a></li>
+            </ul>
+        </li>
+        <li>
+            <button class="profile-details" @onclick="CollapseSidebar">
+                <i class='fa-solid fa-arrows-left-right-to-line'></i>
+                <div class="name-job">
+                    <div class="profile_name">Collapsed View</div>
+                </div>
+            </button>
+        </li>
+    </ul>
+</div>
+
+@code {
+    async Task CollapseSidebar()
+    {
+        await JSRuntime.InvokeVoidAsync("collapseSidebar", "sidebar");
+    }
+}

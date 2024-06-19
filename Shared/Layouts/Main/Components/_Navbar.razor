@@ -1,0 +1,63 @@
+﻿@using QuickTie.Portal.Shared.Identity
+
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageRepository _localStorageService
+
+<ul class="nav align-items-center">
+	<li class="nav-item">
+		<div class="nav-link">
+			<DxButton Context="Theme"
+					  RenderStyle="ButtonRenderStyle.None"
+					  CssClass="p-0 text-nowrap theme-selector"
+					  Click="ToggleTheme">
+				<i class="fa-regular fa-@themeMode menu-item-icon fa-lg"></i>
+			</DxButton>
+		</div>
+	</li>
+	<li class="nav-item">
+		<div class="nav-link">
+			<DxButton Context="Notification"
+				      RenderStyle="ButtonRenderStyle.None" 
+					  CssClass="p-0 text-nowrap" 
+					  IconCssClass="fa-regular fa-bell menu-item-icon fa-lg">
+			</DxButton>
+		</div>
+	</li>
+	<li class="nav-item">
+		<div class="nav-link">
+			<DxButton Context="Cart"
+					  RenderStyle="ButtonRenderStyle.None"
+					  CssClass="p-0 text-nowrap"
+					  Click="ToggleDrawer"
+					  IconCssClass="fa-solid fa-cart-shopping menu-item-icon fa-lg">
+			</DxButton>
+		</div>
+	</li>
+	<li class="nav-item dropdown">
+		<LoginDisplay />
+	</li>
+</ul>
+@code {
+	private async Task ToggleDrawer()
+	{
+		await JSRuntime.InvokeVoidAsync("toggleDrawer", "drawer");
+	}
+	string themeMode = "sun";
+
+	private async Task ToggleTheme()
+	{
+		themeMode = themeMode == "sun" ? "moon" : "sun";
+		await JSRuntime.InvokeVoidAsync("changeTheme", themeMode);
+		await _localStorageService.SetItemAsync("theme", themeMode);
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			themeMode = await _localStorageService.GetItemAsync<string>("theme") ?? "sun";
+			await JSRuntime.InvokeVoidAsync("changeTheme", themeMode);
+			StateHasChanged();
+		}
+	}
+}

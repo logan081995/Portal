@@ -1,0 +1,65 @@
+﻿:root {
+    /* Root colors*/
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-grey: #848484;
+    --color-dark: #212a2f;
+    --color-primary: #009aa6;
+    --color-secondary: #9e3039;
+
+    /* Bootstrap colors */
+    --color-bs-secondary: #6c757d;
+
+    /* QuickTie colors */
+    --quicktie-primary-soft: #009aa6;
+    --quicktie-secondary-soft: #9e3039;
+    --quicktie-grey-soft: #848484;
+    --quicktie-dark-soft: #212a2f;
+
+    --quicktie-bg-sun-soft: #f5f7fa; 
+
+    --quicktie-bg-moon-soft: #0f111a; 
+    --quicktie-bg-moon-100: #141824; 
+
+    --quicktie-soft: #ffffff;
+    --quicktie-100: #e3e6ed;
+    --quicktie-200: #8a94ad;
+    --quicktie-300: #dee2e6;
+    --quicktie-400: #31374a;
+    --quicktie-500: #9fa6bc;
+    --quicktie-1000: #000000;
+}
+
+[data-theme="sun"] {
+    --color-main-bg: var(--quicktie-bg-sun-soft);
+    --color-header-bg: var(--color-white);
+    --color-sidebar-bg: var(--color-white);
+    --color-footer-bg: var(--quicktie-bg-sun-soft);
+
+    --color-text-main: var(--color-black);
+    --color-text-sub: var(--color-bs-secondary);
+
+    --color-border: var(--quicktie-300);
+
+    --color-header-icon: var(--quicktie-grey-soft);
+
+    --color-search-box-bg: var(--quicktie-soft);
+
+    --color-grid-table-bg: var(--quicktie-soft);
+}
+
+[data-theme="moon"] {
+    --color-main-bg: var(--quicktie-bg-moon-soft);
+    --color-header-bg: var(--quicktie-bg-moon-100);
+    --color-sidebar-bg: var(--quicktie-bg-moon-100);
+    --color-footer-bg: var(--quicktie-bg-moon-soft);
+
+    --color-text-main: var(--quicktie-100);
+    --color-text-sub: var(--quicktie-200);
+
+    --color-border: var(--quicktie-400);
+    --color-header-icon: var(--quicktie-500);
+
+    --color-search-box-bg: var(--quicktie-bg-moon-100);
+    --color-grid-table-bg: var(--quicktie-bg-moon-100);
+}

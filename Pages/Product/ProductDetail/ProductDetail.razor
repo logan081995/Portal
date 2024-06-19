@@ -1,0 +1,184 @@
+﻿@page "/products/{Id?}"
+@using QuickTie.Data.Models
+@using QuickTie.Portal.Pages.Product.ProductDetail.ProductTypes
+@using QuickTie.Portal.Pages.Product.ProductDetail.Components
+@using QuickTie.Portal.Models
+@using QuickTie.Portal.Extensions
+
+@inject NavigationManager NavManager
+@inject IProductService _productService
+@inject ICartService _cartService
+@inject IJSRuntime JSRuntime
+
+<div class="px-4 py-3">
+    <div class="row">
+        <div class="col-12">
+            @if (product == null)
+            {
+                <div class="placeholder-glow pb-3">
+                    <div class="placeholder col-1 pe-1"></div>
+                    <div class="placeholder col-1 pe-1"></div>
+                    <div class="placeholder col-1"></div>
+                </div>
+            }
+            else
+            {
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <DxButton RenderStyle="ButtonRenderStyle.None"
+                                      CssClass="fw-bold clickable p-0"
+                                      NavigateUrl="/products"
+                                      Text="Home">
+                            </DxButton>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <DxButton RenderStyle="ButtonRenderStyle.None"
+                                      CssClass="text-secondary p-0">
+                                <span class="text-secondary">
+                                    @product?.ProductType
+                                </span>
+                            </DxButton>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <DxButton RenderStyle="ButtonRenderStyle.None"
+                                      CssClass="text-secondary p-0">
+                                <span class="text-secondary">
+                                    @product?.Manufacturer
+                                </span>
+                            </DxButton>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <DxButton RenderStyle="ButtonRenderStyle.None"
+                                      CssClass="text-secondary p-0">
+                                <span class="text-secondary">
+                                    @product?.Name
+                                </span>
+                            </DxButton>
+                        </li>
+                    </ol>
+                </nav>
+            }
+        </div>
+        <div class="col-md-6 col-12">
+            <div class="d-flex image-container justify-content-center pb-3">
+                @if (product == null)
+                {
+                    <div class="placeholder-glow w-100">
+                        <div class="placeholder"></div>
+                    </div>
+                } else
+                {
+                   <ImageView images="@product.Images" Id="@product.Id"/>
+                }
+            </div>
+        </div>
+        <div class="col-md-6 col-12 px-3">
+            @if (product == null)
+            {
+                <div class="placeholder-glow">
+                    <h2 class="placeholder col-7"></h2>
+                    <h6 class="placeholder col-12"></h6>
+                    <h6 class="placeholder col-12 mb-5"></h6>
+                    <h6 class="placeholder col-4"></h6>
+                    <p class="placeholder col-10 mb-3"></p>
+                    <h6 class="placeholder col-4"></h6>
+                    <p class="placeholder col-10 mb-3"></p>
+                    <h6 class="placeholder col-4"></h6>
+                    <p class="placeholder col-10 mb-3"></p>
+                    <h6 class="placeholder col-4"></h6>
+                    <p class="placeholder col-10 mb-3"></p>
+                </div>
+            } else
+            {
+                <div class="unique-info">
+                    @switch(product){
+                        case Hanger hangerProduct:
+                        <Hangers item="@hangerProduct" />
+                        break;
+
+                        case PlywoodClip clipProduct:
+                        <Clips item="@clipProduct" />
+                        break;
+
+                        case Strap strapProduct:
+                        <CoilStrappings item="@strapProduct" />
+                        break;
+
+                        case QuickTieCable cableProduct:
+                        <QuickTieCables item="@cableProduct" />
+                        break;
+
+                        case Holdown holdownProduct:
+                        <Holdowns item="@holdownProduct" />
+                        break;
+
+                        case AnchorBolt anchorBoltProduct:
+                        <AnchorBolts item = "@anchorBoltProduct" />
+                        break;
+
+                        default:
+                        <p>Oops! Something went wrong. Please reload the page or try again later.</p>
+                        break;
+                    }
+                </div>
+
+                <div class="mt-4 pt-3 d-flex justify-content-end align-items-center border-top border-1">
+                    <h4 class="pe-5 mb-0 product-price fw-bold">$@product.UnitCost</h4>
+                    <DxButton RenderStyle="ButtonRenderStyle.None" Text="Add to Cart" Click="() => AddToCart(product)" CssClass="text-uppercase px-3 py-2 btn-custom-1" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    Product product { get; set; } = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (String.IsNullOrEmpty(Id))
+            {
+                NavManager.NavigateTo("/");
+                return;
+            }
+
+            // Fetch the product data from the database.
+            await LoadProduct();
+        }
+    }
+
+    private async Task LoadProduct()
+    {
+        product = await _productService.GetProductByIdAsync(Id);
+        if(product == null)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Product not founded");
+            NavManager.NavigateTo("/");
+        }
+        await Task.Delay(1000);
+
+        StateHasChanged();
+    }
+
+    private async Task AddToCart(Product item)
+    {
+        CartItem cartItem = new CartItem()
+            {
+                ItemId = item.Id,
+                ItemName = item.Name,
+                ImageURL = item.MainProductImage,
+                Quantity = 1,
+                PricePerUnit = (decimal)item.UnitCost,
+                Type = item.ProductType.GetEnumDisplayName(),
+                Detail = item.UPC
+            };
+        await _cartService.AddItemAsync(cartItem);
+        await JSRuntime.InvokeVoidAsync("toggleDrawer", "drawer");
+    }
+}

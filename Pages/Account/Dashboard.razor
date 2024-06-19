@@ -1,0 +1,43 @@
+﻿@page "/"
+@layout MainLayout
+@*@attribute [Authorize]*@
+
+@inject IJSRuntime js
+@inject NavigationManager _navManager;
+
+@using QuickTie.Portal.Pages.Account.SubTabs
+
+<div class="w-100">
+    <div class="page-header px-4 py-4">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item">
+                    <DxButton RenderStyle="ButtonRenderStyle.None"
+                              CssClass="fw-bold clickable p-0"
+                              NavigateUrl="/products"
+                              Text="Home" />
+                </li>
+                <li class="breadcrumb-item">
+                    <DxButton RenderStyle="ButtonRenderStyle.None"
+                              CssClass="fw-bold text-secondary p-0"
+                              Text="Orders" />
+                </li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0">Orders</h2>
+    </div>
+    <Orders />
+</div>
+@code {
+    int ActiveTabIndex { get; set; } = 1;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var authState = await authenticationStateTask;
+
+        var user = authState.User;
+    }
+}

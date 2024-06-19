@@ -1,0 +1,258 @@
+﻿@using QuickTie.Data.Models
+@using QuickTie.Services.Interface;
+
+@inject IFileService _fileService   
+@inject IProductService _productService
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="custCarousel" class="carousel slide" data-ride="carousel" align="center">
+                <!-- slides -->
+                <div class="carousel-inner bg-light">
+                    @foreach(var item in images.Select((value, index) => (value, index)))
+                    {
+                        <div class="carousel-item p-5 @(item.index == 0 ? "active" : "")">
+                            <img src="@item.value.Location" alt="Product images">
+                        </div>
+                    }
+                    <a class="carousel-control-prev text-decoration-none" href="#custCarousel" data-bs-slide="prev">
+                        <span class="fa-solid fa-angle-left"></span>
+                    </a>
+                    <a class="carousel-control-next text-decoration-none" href="#custCarousel" data-bs-slide="next">
+                        <span class="fa-solid fa-angle-right"></span>
+                    </a>
+                    <div class="image-edit d-flex flex-column position-absolute w-100 h-100 justify-content-center align-items-center">
+                        <DxButton RenderStyle="ButtonRenderStyle.None" 
+                                  Text="View Details" 
+                                  Click="@(() => PopupViewVisible = true)"
+                                  CssClass="text-uppercase px-3 py-2 mb-1 btn-custom-1" />
+                    </div>
+                </div>
+                <!-- Thumbnails -->
+                <ol class="carousel-indicators list-inline">
+                    @foreach (var item in images.Select((value, index) => (value, index)))
+                    {
+                        <li class="list-inline-item p-0 m-0 mx-1 @(item.index == 0 ? "active":"")">
+                            <a id="carousel-selector-@item.index" class="@(item.index == 0 ? "selected":"")" data-bs-slide-to="@item.index" data-bs-target="#custCarousel">
+                                <img src="@item.value.Location" class="img-fluid">
+                            </a>
+                        </li>
+                    }
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<DxPopup HeaderText="View Details"
+         @bind-Visible="@PopupViewVisible"
+         Width="90%"
+         MaxWidth="700px"
+         Context="View"
+         ShowFooter="true">
+         <BodyContentTemplate>
+          <div class="image-list">
+            <DxGrid Data="images"
+                    CssClass="image-grid"
+                    @bind-SelectedDataItems="SelectedDataItems"
+                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.AllPages">
+                <Columns>
+                    <DxGridSelectionColumn Width="60px" />
+                    <DxGridDataColumn FieldName="Location" TextAlignment="GridTextAlignment.Center" Caption="Images" MinWidth="100">
+                        <CellDisplayTemplate>
+                            <img src="@context.DisplayText" height="100" />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    @*
+                    <DxGridCommandColumn Width="100px" NewButtonVisible="false" EditButtonVisible="false" DeleteButtonVisible="false">
+                        <CellDisplayTemplate>
+                            <DxButton CssClass="my-1 ms-2"
+                                  RenderStyle="ButtonRenderStyle.Secondary"
+                                  IconCssClass="fa-solid fa-trash-can"
+                                  Click="@(() => PopupConfirmVisible = true)" />
+                        </CellDisplayTemplate>
+                    </DxGridCommandColumn> *@
+                </Columns>
+            </DxGrid>
+          </div>
+        </BodyContentTemplate>
+        <FooterContentTemplate>
+            <DxButton CssClass="btn-popup-custom-1 my-1 ms-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      IconCssClass="fa-solid fa-plus"
+                      Text="New Upload"
+                      Click="@(() => PopupUploadVisible = true)" />
+            <DxButton CssClass="btn-popup-custom-2 my-1 ms-2"
+                      Enabled="@(SelectedDataItems.Count() > 0 && !isDeleting ? true : false)"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Click="@(() => PopupConfirmVisible = true)">
+                <div class="d-flex">
+                    <DxWaitIndicator Visible="isDeleting" />
+                    <span>Delete (@SelectedDataItems.Count() items)</span>
+                </div>
+              </DxButton>
+        </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup HeaderText="Add New Images"
+@bind-Visible="@PopupUploadVisible"
+         Width="90%"
+         MaxWidth="700px"
+         Context="Upload"
+         ShowFooter="true">
+    <BodyContentTemplate>
+        <div class="upload-container">
+            <div class="text-center mt-3">
+                <div class="fa-solid fa-file-arrow-up upload-icon mb-2"></div>
+                <p class="mb-2">Click the Select Files button to select a file</p>
+            </div>
+            <InputFile OnChange="@OnFileChange" class="form-control" multiple style="width:250px" />
+            <div class="mt-1">
+                <p class="text-danger">@UploadFeedback</p>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center image-container">
+                @foreach (var imageSource in imageSources)
+                {
+                    <img src="@imageSource" width="250" class="m-2 border border-2 p-1 rounded" />
+                }
+            </div>
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="btn-popup-custom-1 my-1 ms-2"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  IconCssClass="fa-solid fa-upload"
+                  Enabled="@(UploadItemsCount > 0 && !isUploading ? true : false)"
+                  Text="Upload"
+                  Click="UploadImages">
+            <div class="d-flex">
+                <DxWaitIndicator Visible="isUploading" />
+                <span class="mx-2">@context</span>
+            </div>
+         </DxButton>
+        <DxButton CssClass="popup-button my-1 ms-2"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel"
+                  Click="@(() => PopupUploadVisible = false)" />
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup HeaderText="Confirm"
+         @bind-Visible="@PopupConfirmVisible"
+         Width="90%"
+         MaxWidth="200px"
+         ShowFooter="true"
+         Context="Confirm">
+    <BodyContentTemplate>
+        <h6>Delete now?</h6>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="btn-popup-custom-1 my-1 ms-2"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="OK"
+                  Click="DeleteImages" />
+        <DxButton CssClass="popup-button my-1 ms-2"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel"
+                  Click="@(() => PopupConfirmVisible = false)" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter]
+    public List<ProductImage> images { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    bool PopupViewVisible { get; set; } = false;
+
+    private bool _popupUploadVisible = false;
+    public bool PopupUploadVisible
+    {
+        get => _popupUploadVisible;
+        set
+        {
+            if (!value)
+            {
+                ClearPreviewImages();
+            }
+            _popupUploadVisible = value;
+        }
+    }
+
+    bool PopupConfirmVisible { get; set; } = false;
+
+    IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>().AsReadOnly();
+    List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+    private List<string> imageSources { get; set; } = new List<string> { };
+
+    int UploadItemsCount { get; set; } = 0;
+    private const int maxAllowedFiles = 6;
+    private string UploadFeedback;
+    private string DeleteFeedback;
+
+    bool isUploading = false;
+    bool isDeleting = false;
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        ClearPreviewImages();
+        UploadFeedback = string.Empty;
+        if (e.FileCount > maxAllowedFiles)
+        {
+            UploadFeedback = $"Only {maxAllowedFiles} files can be uploaded";
+            return;
+        }
+        uploadedFiles.AddRange(e.GetMultipleFiles(maxAllowedFiles));
+        UploadItemsCount = e.FileCount;
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            using var stream = file.OpenReadStream();
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            imageSources.Add($"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}");
+        }
+    }
+    private async Task UploadImages()
+    {
+        isUploading = true;
+        const string bucketName = "quicktie";
+        const string s3FilePath = "products/images/test";
+        await Task.Delay(2000);
+        var (result, uploadedUrls) = await _fileService.FileUploadsToS3(uploadedFiles, bucketName, s3FilePath);
+        if (result)
+        {
+            UploadFeedback = "Successfully uploaded!";
+            await _productService.AddProductImages(Id, uploadedUrls);
+        } else
+        {
+            UploadFeedback = "Failed to upload some files. Please try again.";
+        }
+        ClearPreviewImages();
+        isUploading = false;
+    }
+    private async Task DeleteImages()
+    {
+        isDeleting = true;
+        PopupConfirmVisible = false;
+
+        var selectedImages = SelectedDataItems.Cast<ProductImage>().ToList();
+        var result = await _productService.DeleteProductImages(Id, selectedImages);
+        await Task.Delay(1000);
+        if(result)
+        {
+            SelectedDataItems = new List<object>().AsReadOnly();
+        }
+        isDeleting = false;
+    }
+
+    private void ClearPreviewImages()
+    {
+        imageSources.Clear();
+        uploadedFiles.Clear();
+        UploadItemsCount = 0;
+    }
+}

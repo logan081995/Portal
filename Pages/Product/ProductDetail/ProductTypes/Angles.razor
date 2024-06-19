@@ -1,0 +1,174 @@
+﻿@using QuickTie.Data.Models
+@using QuickTie.Portal.Extensions
+
+@inject IProductService _productService
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView Roles="ProductEditor" Context="Auth">
+    <Authorized>
+        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        CssClass="w-100"
+                        IsContentBlocked="true"
+                        IndicatorVisible="indicatorVisible"
+                        IndicatorAreaVisible="indicatorAreaVisible"
+                        Visible="indicatorVisible"
+                        Text="Updating data..."
+                        TextAlignment="LoadingPanelTextAlignment.Right">
+            <EditForm EditContext="AngleFormContext" Context="AngleForm">
+                <DxFormLayout CssClass="w-100 product-detail-edit-form">
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Name:">
+                        <DxTextBox Text="@item.Name"
+                                   BindValueMode="BindValueMode.OnDelayedInput"
+                                   TextExpression="@(() => item.Name)"
+                                   TextChanged="@(async (string new_value) => {
+                                                item.Name = new_value;
+                                                await HandleChange();
+                                            })"
+                                   InputDelay="1000" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Description:" CssClass="mb-5">
+                        <DxMemo Text="@item.Description"
+                                BindValueMode="BindValueMode.OnDelayedInput"
+                                TextExpression="@(() => item.Description)"
+                                TextChanged="@(async (string new_value) => {
+                                            item.Description = new_value;
+                                            await HandleChange();
+                                        })"
+                                InputDelay="1000" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Manufacturer:">
+                        <DxComboBox Data="@ManufaturerList"
+                                    Value="@item.Manufacturer"
+                                    ValueExpression="@(() => item.Manufacturer )"
+                                    ValueChanged="@(async (Manufacturer new_value) => {
+                                                item.Manufacturer = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Coating Type:">
+                        <DxComboBox Data="@CoatingTypeList"
+                                    Value="@item.Coating"
+                                    ValueExpression="@(() => item.Coating )"
+                                    ValueChanged="@(async (CoatingType new_value) => {
+                                                item.Coating = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Width1:" BeginRow="true">
+                        <DxSpinEdit Value="@item.Width1"
+                                    ValueExpression="@(() => item.Width1)"
+                                    ValueChanged="@(async (double newValue) => {
+                                        item.Width1 = newValue;
+                                        await HandleChange();
+                                        })"
+                                    InputDelay="1000"
+                                    BindValueMode="BindValueMode.OnDelayedInput" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Width2:">
+                        <DxSpinEdit Value="@item.Width2"
+                                    ValueExpression="@(() => item.Width2)"
+                                    ValueChanged="@(async (double newValue) => {
+                                        item.Width2 = newValue;
+                                        await HandleChange();
+                                        })"
+                                    InputDelay="1000"
+                                    BindValueMode="BindValueMode.OnDelayedInput" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Length:">
+                        <DxSpinEdit Value="@item.Length"
+                                    ValueExpression="@(() => item.Length)"
+                                    ValueChanged="@(async (double newValue) => {
+                                        item.Length = newValue;
+                                        await HandleChange();
+                                        })"
+                                    InputDelay="1000"
+                                    BindValueMode="BindValueMode.OnDelayedInput" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Gauge:">
+                        <DxComboBox Data="@GaugeList"
+                                    Value="@item.Gauge"
+                                    ValueExpression="@(() => item.Gauge )"
+                                    ValueChanged="@(async (Gauge new_value) => {
+                                                item.Gauge = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+
+        </DxLoadingPanel>
+    </Authorized>
+    <NotAuthorized>
+        <div class="mb-5">
+            <div class="d-flex align-items-center">
+                <h2 class="fw-bold pe-5">@item.Name</h2>
+                <span class="product-badge">@item.ProductType</span>
+            </div>
+            <h6>@item.Description</h6>
+        </div>
+        <div class="mb-3">
+            <h6 class="fw-bold">Manufacturer</h6>
+            <span>@item.Manufacturer</span>
+        </div>
+
+        <div class="mb-3">
+            <h6 class="fw-bold">Measurements</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Gauge:</span>@item.Gauge
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Width1:</span>@item.Width1
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Width2:</span>@item.Width2
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Length:</span>@item.Length
+                </span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <h6 class="fw-bold">Coating</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    @item.Coating
+                </span>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool indicatorVisible { get; set; } = false;
+    bool indicatorAreaVisible { get; set; } = false;
+    LoadingPanelTextAlignment textAlignment = LoadingPanelTextAlignment.Right;
+
+    [Parameter]
+    public Angle item { get; set; }
+
+    private EditContext AngleFormContext;
+
+    protected override void OnInitialized()
+    {
+        AngleFormContext = new EditContext(item);
+    }
+
+    IEnumerable<Manufacturer> ManufaturerList => Enum.GetValues(typeof(Manufacturer)).Cast<Manufacturer>();
+    IEnumerable<CoatingType> CoatingTypeList => Enum.GetValues(typeof(CoatingType)).Cast<CoatingType>();
+    IEnumerable<Gauge> GaugeList => Enum.GetValues(typeof(Gauge)).Cast<Gauge>();
+
+    private async Task HandleChange()
+    {
+        indicatorVisible = true;
+        indicatorAreaVisible = true;
+        bool result = await _productService.UpdateProductAsync(item);
+        // if(!result)
+        //{
+        //    await JSRuntime.InvokeVoidAsync("alert", "Error: Updated data not saved. Try again later!");
+        // }
+        await Task.Delay(2000);
+        indicatorVisible = false;
+        indicatorAreaVisible = false;
+    }
+}

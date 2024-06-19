@@ -1,0 +1,71 @@
+﻿.dxbl-grid-search-box-container {
+    width: 100% !important;
+    padding: 10px 0px !important;
+}
+
+.dxbl-grid-table {
+    border: 0 !important;
+    border-collapse: collapse !important;
+}
+
+.dxbl-grid-top-panel {
+    border: 0 !important;
+}
+
+.dxbl-grid-table tr{
+    border-bottom: 1px solid var(--color-border) !important;
+    background: var(--color-grid-table-bg) !important;
+    color: var(--color-text-sub);
+}
+
+.dxbl-grid-table tbody tr {
+    cursor: pointer;
+}
+
+.dxbl-grid-table td, th {
+    padding: 15px !important;
+}
+
+.dxbl-grid-header-row th {
+    background: var(--color-grid-table-bg) !important;
+}
+
+.image-grid .dxbl-grid-header-content {
+    justify-content: center;
+}
+
+.data-grid .dxbl-pager-active-page-btn {
+    color: var(--color-text-sub) !important;
+    background: var(--color-dark) !important;
+}
+
+.data-grid .dxbl-pager-container {
+    justify-content: end !important;
+}
+
+.data-grid .dxbl-tabs-tablist {
+    padding: 0 20px !important;
+}
+
+.data-grid .search-box {
+    background: var(--color-search-box-bg);
+    color: var(--color-text-sub);
+    border-color: var(--color-border);
+}
+
+.data-grid .search-box .dxbl-btn {
+    background: var(--color-search-box-bg) !important;
+    color: var(--color-text-sub);
+}
+
+.data-grid .dxbl-text-edit {
+    color: var(--color-text-sub);
+}
+
+.data-grid .dxbl-edit-btn-dropdown {
+    color: var(--color-text-sub);
+}
+
+.data-grid .dxbl-grid {
+    border: none;
+}

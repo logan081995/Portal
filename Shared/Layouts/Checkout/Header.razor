@@ -1,0 +1,56 @@
+﻿@using QuickTie.Portal.Data.Repository.Services
+@using QuickTie.Portal.Models
+@inject BreadcrumbService _breadcrumbService
+@inject NavigationManager NavManager
+
+<div class="header">
+    <div class="logo mb-2 pt-4">
+        <DxButton Context="logo" 
+                  RenderStyle="ButtonRenderStyle.None" 
+                  CssClass="p-0 text-nowrap" 
+                  NavigateUrl="/">
+            <img height="50" src="images/logo.png" />
+        </DxButton>
+    </div>
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white">
+            @foreach (var breadcrumb in Breadcrumbs)
+            {
+                <li class="breadcrumb-item">
+                    <DxButton RenderStyle="ButtonRenderStyle.None"
+                              CssClass="fw-bold text-black p-1"
+                              NavigateUrl="@breadcrumb.Url"
+                              Text="@breadcrumb.Name">
+                        <span class=" @(breadcrumb.Name == Breadcrumbs.Last().Name ? "text-secondary" : "")">
+                            @context
+                        </span>
+                    </DxButton>
+                </li>
+            }
+        </ol>
+    </nav>
+</div>
+
+@code {
+    private List<BreadcrumbItem> Breadcrumbs { get; set; } = new List<BreadcrumbItem>();
+    protected override void OnInitialized()
+    {
+        NavManager.LocationChanged += HandleLocationChanged;
+        UpdateBreadcrumbs();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdateBreadcrumbs();
+        StateHasChanged();
+    }
+
+    private void UpdateBreadcrumbs()
+    {
+        var uri = new Uri(NavManager.Uri);
+        var lastSegment = uri.Segments.Last().Trim('/');
+
+        Breadcrumbs = _breadcrumbService.GetBreadcrumbs(lastSegment);
+    }
+
+}

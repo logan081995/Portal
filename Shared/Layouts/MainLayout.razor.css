@@ -1,0 +1,18 @@
+﻿main {
+    flex: 1;
+    background: var(--color-main-bg);
+    width: 70%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#wrapper {
+    display: flex;
+    height: calc(100vh - 85px);
+    margin-top: 84px;
+    transition: all 0.3s;
+}
+
+#content {
+    min-height: calc(100% - 63px);
+}

@@ -1,0 +1,37 @@
+﻿.nav-link .menu-item-icon {
+    font-size: 18px;
+    color: var( --color-header-icon);
+}
+
+.nav-link .menu-item-icon.login {
+    color: var(--quicktie-primary-soft) !important;
+}
+
+.nav-link .menu-item-icon:hover {
+    color: var(--quicktie-primary-soft);
+}
+
+#global-search {
+    width: 100%;
+    max-width: 500px;
+    background: transparent;
+    color: var(--color-text-sub);
+    border-color: var(--color-border);
+}
+
+#global-search .dxbl-btn {
+    background-color: var(--color-header-bg);
+    color: var(--color-text-sub);
+}
+
+.page-header h2 {
+    color: var(--color-text-main);
+}
+
+.page-header .breadcrumb-item .clickable {
+    color: var(--color-text-sub) !important;
+}
+
+.page-header .breadcrumb-item::before {
+    color: var(--color-text-sub);
+}

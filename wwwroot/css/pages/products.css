@@ -1,0 +1,42 @@
+﻿.product-list .dxbl-active {
+    color: var(--color-primary) !important;
+}
+
+    .product-list .dxbl-active::after {
+        background-color: var(--color-primary) !important;
+    }
+
+.product-category .dxbl-active {
+    color: var(--color-secondary) !important;
+    border: none !important;
+    box-shadow: 0 3px 4px rgba(0,0,0,.07);
+    background: var(--color-white) !important;
+}
+
+.product-category .dxbl-tabs-item {
+    font-weight: 600;
+    border-radius: 5px;
+    padding: 0 15px !important;
+    margin: 3px;
+}
+
+    .product-category .dxbl-tabs-item:hover {
+        border: none !important;
+        color: var(--color-secondary) !important;
+    }
+
+.product-category .dxbl-tabs-scroll-btn-prev, .product-category .dxbl-tabs-scroll-btn-next {
+    color: var(--color-secondary) !important;
+}
+
+#product-search {
+    max-width: 500px;
+    background: var(--color-search-box-bg);
+    color: var(--color-text-sub);
+    border-color: var(--color-border);
+}
+
+#product-search .dxbl-btn {
+    background: var(--color-search-box-bg) !important;
+    color: var(--color-text-sub);
+}

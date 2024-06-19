@@ -1,0 +1,158 @@
+﻿@using QuickTie.Data.Models
+@using QuickTie.Portal.Extensions
+
+@inject IProductService _productService
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView Roles="ProductEditor" Context="Auth">
+    <Authorized>
+        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        CssClass="w-100"
+                        IsContentBlocked="true"
+                        IndicatorVisible="indicatorVisible"
+                        IndicatorAreaVisible="indicatorAreaVisible"
+                        Visible="indicatorVisible"
+                        Text="Updating data..."
+                        TextAlignment="LoadingPanelTextAlignment.Right">
+            <EditForm EditContext="WasherFormContext" Context="BearingPlateForm">
+                <DxFormLayout CssClass="w-100 product-detail-edit-form">
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Name:">
+                        <DxTextBox Text="@item.Name"
+                                   BindValueMode="BindValueMode.OnDelayedInput"
+                                   TextExpression="@(() => item.Name)"
+                                   TextChanged="@(async (string new_value) => {
+                                                item.Name = new_value;
+                                                await HandleChange();
+                                            })"
+                                   InputDelay="1000" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Description:" CssClass="mb-5">
+                        <DxMemo Text="@item.Description"
+                                BindValueMode="BindValueMode.OnDelayedInput"
+                                TextExpression="@(() => item.Description)"
+                                TextChanged="@(async (string new_value) => {
+                                            item.Description = new_value;
+                                            await HandleChange();
+                                        })"
+                                InputDelay="1000" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Manufacturer:">
+                        <DxComboBox Data="@ManufaturerList"
+                                    Value="@item.Manufacturer"
+                                    ValueExpression="@(() => item.Manufacturer )"
+                                    ValueChanged="@(async (Manufacturer new_value) => {
+                                                item.Manufacturer = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Coating Type:">
+                        <DxComboBox Data="@CoatingTypeList"
+                                    Value="@item.Coating"
+                                    ValueExpression="@(() => item.Coating )"
+                                    ValueChanged="@(async (CoatingType new_value) => {
+                                                item.Coating = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="HoleShape:">
+                        <DxComboBox Data="@HoleTypeList"
+                                    Value="@item.HoleShape"
+                                    ValueExpression="@(() => item.HoleShape )"
+                                    ValueChanged="@(async (HoleType new_value) => {
+                                                item.HoleShape = new_value;
+                                                await HandleChange();
+                                              })" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Thickness:">
+                        <DxSpinEdit Value="@item.Thickness"
+                                    ValueExpression="@(() => item.Thickness)"
+                                    ValueChanged="@(async (double newValue) => {
+                                        item.Thickness = newValue;
+                                        await HandleChange();
+                                        })"
+                                    InputDelay="1000"
+                                    BindValueMode="BindValueMode.OnDelayedInput" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="BoltSize:">
+                        <DxSpinEdit Value="@item.BoltSize"
+                                    ValueExpression="@(() => item.BoltSize)"
+                                    ValueChanged="@(async (double newValue) => {
+                                        item.BoltSize = newValue;
+                                        await HandleChange();
+                                        })"
+                                    InputDelay="1000"
+                                    BindValueMode="BindValueMode.OnDelayedInput" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+
+        </DxLoadingPanel>
+    </Authorized>
+    <NotAuthorized>
+        <div class="mb-5">
+            <div class="d-flex align-items-center">
+                <h2 class="fw-bold pe-5">@item.Name</h2>
+                <span class="product-badge">@item.ProductType</span>
+            </div>
+            <h6>@item.Description</h6>
+        </div>
+        <div class="mb-3">
+            <h6 class="fw-bold">Manufacturer</h6>
+            <span>@item.Manufacturer</span>
+        </div>
+
+        <div class="mb-3">
+            <h6 class="fw-bold">Measurements</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Bolt Size:</span>@item.BoltSize
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Thickness:</span>@item.Thickness
+                </span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <h6 class="fw-bold">Coating</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    @item.Coating
+                </span>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool indicatorVisible { get; set; } = false;
+    bool indicatorAreaVisible { get; set; } = false;
+    LoadingPanelTextAlignment textAlignment = LoadingPanelTextAlignment.Right;
+
+    [Parameter]
+    public Washer item { get; set; }
+
+    private EditContext WasherFormContext;
+
+    protected override void OnInitialized()
+    {
+        WasherFormContext = new EditContext(item);
+    }
+
+    IEnumerable<Manufacturer> ManufaturerList => Enum.GetValues(typeof(Manufacturer)).Cast<Manufacturer>();
+    IEnumerable<CoatingType> CoatingTypeList => Enum.GetValues(typeof(CoatingType)).Cast<CoatingType>();
+    IEnumerable<HoleType> HoleTypeList => Enum.GetValues(typeof(HoleType)).Cast<HoleType>();
+
+    private async Task HandleChange()
+    {
+        indicatorVisible = true;
+        indicatorAreaVisible = true;
+        bool result = await _productService.UpdateProductAsync(item);
+        // if(!result)
+        //{
+        //    await JSRuntime.InvokeVoidAsync("alert", "Error: Updated data not saved. Try again later!");
+        // }
+        await Task.Delay(2000);
+        indicatorVisible = false;
+        indicatorAreaVisible = false;
+    }
+}

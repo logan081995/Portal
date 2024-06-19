@@ -1,0 +1,285 @@
+﻿@using QuickTie.Data.Models
+@using QuickTie.Portal.Extensions
+
+@inject IProductService _productService
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView Roles="ProductEditor" Context="Auth">
+    <Authorized>
+        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        CssClass="w-100"
+                        IsContentBlocked="true"
+                        IndicatorVisible="indicatorVisible"
+                        IndicatorAreaVisible="indicatorAreaVisible"
+                        Visible="indicatorVisible"
+                        Text="Updating data..."
+                        TextAlignment="LoadingPanelTextAlignment.Right">
+        <EditForm EditContext="HangerFormContext" Context="HangerForm">
+            <DxFormLayout CssClass="w-100 product-detail-edit-form">
+                <DxFormLayoutItem ColSpanMd="6" Caption="Name:">
+                    <DxTextBox Text="@item.Name" 
+                               BindValueMode="BindValueMode.OnDelayedInput"
+                               TextExpression="@(() => item.Name)"
+                               TextChanged="@(async (string new_value) => {
+                                                item.Name = new_value;
+                                                await HandleChange();
+                                            })"
+                               InputDelay="1000" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12" Caption="Description:" CssClass="mb-3">
+                    <DxMemo Text="@item.Description"
+                            BindValueMode="BindValueMode.OnDelayedInput"
+                            TextExpression="@(() => item.Description)"
+                            TextChanged="@(async (string new_value) => {
+                                            item.Description = new_value;
+                                            await HandleChange();
+                                        })"
+                            InputDelay="1000" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Manufacturer:">
+                    <DxComboBox Data="@ManufaturerList" 
+                                Value="@item.Manufacturer"
+                                ValueExpression="@(() => item.Manufacturer )"
+                                ValueChanged="@(async (Manufacturer new_value) => {
+                                                item.Manufacturer = new_value;
+                                                await HandleChange();
+                                              })" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Hanger Type:" BeginRow="true">
+                    <DxComboBox Data="@HangerTypeList"
+                                Value="@item.Type"
+                                ValueExpression="@(() => item.Type )"
+                                ValueChanged="@(async (HangerType new_value) => {
+                                        item.Type = new_value;
+                                        await HandleChange();
+                                        })" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Coating Type:">
+                    <DxComboBox Data="@CoatingTypeList"
+                                Value="@item.Coating"
+                                ValueExpression="@(() => item.Coating )"
+                                ValueChanged="@(async (CoatingType new_value) => {
+                                        item.Coating = new_value;
+                                        await HandleChange();
+                                        })" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Width:" BeginRow="true">
+                    <DxSpinEdit Value="@item.Width"
+                                ValueExpression="@(() => item.Width)"
+                                ValueChanged="@(async (double newValue) => {
+                                    item.Width = newValue;
+                                    await HandleChange();
+                                    })"
+                                InputDelay="1000"
+                                BindValueMode="BindValueMode.OnDelayedInput" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Height:">
+                    <DxSpinEdit Value="@item.Height"
+                                ValueExpression="@(() => item.Height)"
+                                ValueChanged="@(async (double newValue) => {
+                                        item.Height = newValue;
+                                        await HandleChange();
+                                        })"
+                                InputDelay="1000"
+                                BindValueMode="BindValueMode.OnDelayedInput" />
+                </DxFormLayoutItem> 
+                <DxFormLayoutItem Caption="Weight:">
+                    <DxSpinEdit Value="@item.Weight"
+                                ValueExpression="@(() => item.Weight)"
+                                ValueChanged="@(async (double newValue) => {
+                                        item.Weight = newValue;
+                                        await HandleChange();
+                                        })"
+                                InputDelay="1000"
+                                BindValueMode="BindValueMode.OnDelayedInput" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Depth:">
+                    <DxSpinEdit Value="@item.Depth"
+                            ValueExpression="@(() => item.Depth)"
+                            ValueChanged="@(async (double newValue) => { 
+                                            item.Depth = newValue;
+                                            await HandleChange(); 
+                                            })"
+                            InputDelay="1000"
+                            BindValueMode="BindValueMode.OnDelayedInput" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Joist Size:">
+                    <DxTextBox Text="@item.JoistSize"
+                                BindValueMode="BindValueMode.OnDelayedInput"
+                                TextExpression="@(() => item.JoistSize)"
+                                TextChanged="@(async (string new_value) => {
+                                            item.JoistSize = new_value;
+                                            await HandleChange();
+                                        })"
+                                InputDelay="1000" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Gauge:">
+                    <DxTextBox Text="@item.Gauge"
+                                BindValueMode="BindValueMode.OnDelayedInput"
+                                TextExpression="@(() => item.Gauge)"
+                                TextChanged="@(async (string new_value) => {
+                                            item.Gauge = new_value;
+                                            await HandleChange();
+                                        })"
+                                InputDelay="1000" />
+                </DxFormLayoutItem>
+                
+            </DxFormLayout>
+        </EditForm>
+        <DxFormLayout CaptionPosition="CaptionPosition.Vertical" CssClass="w-100 pt-3 product-detail-edit-form">
+            <DxFormLayoutItem Caption="Allowable Loads:" ColSpanMd="12">
+                <DxGrid Data="@item.AllowableLoads"
+                        ShowFilterRow="true"
+                        Context="Authorized Grid"
+                        EditorRenderMode="GridEditorRenderMode.Integrated"
+                        CssClass="border-0 pt-2 data-grid"
+                        PageSize="5"
+                        ValidationEnabled="false"
+                        EditModelSaving="Grid_EditModelSaving"
+                        DataItemDeleting="Grid_DataItemDeleting"
+                        EditMode="GridEditMode.EditRow"
+                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always">
+                    <Columns>
+                        <DxGridCommandColumn MinWidth="160" />
+                        <DxGridDataColumn FieldName="Application" MinWidth="70" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="Species" MinWidth="130" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="LoadDurationFactor" Caption="Load Duration Factor" MinWidth="130" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="Load" Width="130" MinWidth="100" TextAlignment="GridTextAlignment.Right" />
+                    </Columns>
+                </DxGrid>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+        </DxLoadingPanel>
+    </Authorized>
+    <NotAuthorized>
+        <div class="mb-4">
+            <div class="d-flex align-items-center">
+                <h2 class="fw-bold pe-5">@item.Name</h2>
+                <span class="product-badge">@item.ProductType</span>
+            </div>
+            <h6>@item.Description</h6>
+        </div>
+        <div class="mb-3">
+            <h6 class="fw-bold">Manufacturer</h6>
+            <span>@item.Manufacturer</span>
+        </div>
+
+        <div class="mb-3">
+            <h6 class="fw-bold">Measurements</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Width:</span>@item.Width
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Height:</span>@item.Height
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Weight:</span>@item.Weight
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Depth:</span>@item.Depth
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Joist Size:</span>@item.JoistSize
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Gauge:</span>@item.Gauge
+                </span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <h6 class="fw-bold">Type & Coating</h6>
+            <div class="d-flex flex-wrap">
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Hanger Type:</span>@item.Type
+                </span>
+                <span class="col-6">
+                    <span class="text-secondary pe-3">Coating:</span>@item.Coating
+                </span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <h6 class="fw-bold">Allowable Loads</h6>
+            <DxGrid Data="AllowableLoads"
+                    ShowFilterRow="true"
+                    Context="NotAuthorized Grid"
+                    EditorRenderMode="GridEditorRenderMode.Integrated"
+                    CssClass="border-0 pt-2 data-grid"
+                    PageSize="5">
+                <Columns>
+                    <DxGridDataColumn FieldName="Application" Width="120" MinWidth="70" TextAlignment="GridTextAlignment.Right"/>
+                    <DxGridDataColumn FieldName="Species" MinWidth="130" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn FieldName="LoadDurationFactor" Caption="Load Duration Factor" MinWidth="130" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn FieldName="Load" Width="130" MinWidth="100" TextAlignment="GridTextAlignment.Right" />
+                </Columns>
+            </DxGrid>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    bool indicatorVisible { get; set; }  = false;
+    bool indicatorAreaVisible { get; set; }  = false;
+    LoadingPanelTextAlignment textAlignment = LoadingPanelTextAlignment.Right;
+
+    [Parameter]
+    public Hanger item { get; set; }
+
+    List<AllowableLoad> AllowableLoads { get; set; }
+    private EditContext HangerFormContext;
+
+    protected override void OnInitialized()
+    {
+        HangerFormContext = new EditContext(item);
+        AllowableLoads = item.AllowableLoads.ToList();
+    }
+
+    IEnumerable<Manufacturer> ManufaturerList => Enum.GetValues(typeof(Manufacturer)).Cast<Manufacturer>();
+    IEnumerable<HangerType> HangerTypeList => Enum.GetValues(typeof(HangerType)).Cast<HangerType>();
+    IEnumerable<CoatingType> CoatingTypeList => Enum.GetValues(typeof(CoatingType)).Cast<CoatingType>();
+
+    private async Task HandleChange()
+    {
+        indicatorVisible = true;
+        indicatorAreaVisible = true;
+        bool result = await _productService.UpdateProductAsync(item);
+        // if(!result)
+        //{
+        //    await JSRuntime.InvokeVoidAsync("alert", "Error: Updated data not saved. Try again later!");
+        // }
+        await Task.Delay(2000);
+        indicatorVisible = false;
+        indicatorAreaVisible = false;
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            AllowableLoads.Add((AllowableLoad)e.EditModel);
+        }
+        else
+        {
+            var index = AllowableLoads.IndexOf((AllowableLoad)e.DataItem);
+            if(index != -1)
+            {
+                AllowableLoads[index] = (AllowableLoad)e.EditModel;
+            }
+        }
+        item.AllowableLoads = AllowableLoads;
+        await UpdateDataAsync();
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        AllowableLoads.Remove((AllowableLoad)e.DataItem);
+        item.AllowableLoads = AllowableLoads;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        await _productService.UpdateProductAsync(item);
+    }
+}
